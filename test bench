@@ -1,0 +1,39 @@
+`timescale 1ns / 1ps
+module traffic_tb;
+    reg clk, rst;
+    wire [2:0] light_M1, light_S, light_MT, light_M2;
+    wire [3:0] count;       // Observing count
+    wire [2:0] ps;          // Observing ps (present state)
+
+    // Instantiate traffic_light module
+    traffic_light dut(
+        .clk(clk),
+        .rst(rst),
+        .light_M1(light_M1),
+        .light_S(light_S),
+        .light_MT(light_MT),
+        .light_M2(light_M2),
+        .count(count),      // Debugging output
+        .ps(ps)             // Debugging output
+    );
+
+    // Clock Generation
+    initial begin
+        clk = 1'b0;
+        forever #5 clk = ~clk;  // 10-time-unit clock period
+    end
+
+    // Reset and Simulation Control
+    initial begin
+        rst = 1'b1;         // Assert reset
+        #10 rst = 1'b0;     // De-assert reset after 10 time units
+        #2000;              // Run simulation for 2000 time units
+        $finish;            // End simulation
+    end
+
+    // Monitoring Outputs
+    initial begin
+        $monitor("Time=%0d : ps=%d, count=%d, light_M1=%b, light_M2=%b, light_MT=%b, light_S=%b",
+                 $time, ps, count, light_M1, light_M2, light_MT, light_S);
+    end
+endmodule
